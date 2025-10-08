@@ -3939,6 +3939,122 @@
             background: rgba(255,255,255,0.9);
             transform: scale(1.05);
         }
+
+        /* Campaigns Hub Styles */
+        .filter-pill {
+            background: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .filter-pill.active {
+            background: #E2192D;
+            color: white;
+            border-color: #E2192D;
+        }
+
+        .campaign-card {
+            background: white;
+            border: 1px solid #F0F0F0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .campaign-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .campaign-mini-card {
+            background: white;
+            border: 1px solid #F0F0F0;
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .campaign-mini-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .campaign-action-btn {
+            flex: 1;
+            background: #E2192D;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .campaign-action-btn:hover {
+            background: #C41230;
+        }
+
+        .campaign-action-btn-secondary {
+            flex: 1;
+            background: #FFFFFF;
+            color: #E2192D;
+            border: 1px solid #E2192D;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .campaign-action-btn-secondary:hover {
+            background: #FFF5F5;
+        }
+
+        /* Campaign Detail Modal */
+        .campaign-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9000;
+            display: none;
+            overflow-y: auto;
+        }
+
+        .campaign-modal-overlay-inner {
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .campaign-modal-container {
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: popIn 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -6539,6 +6655,13 @@
                     <div class="tool-badge new">NEW</div>
                 </div>
 
+                <div class="tool-card" onclick="switchScreen('campaigns')">
+                    <div class="tool-icon">🏷️</div>
+                    <div class="tool-name">Campaigns & Discounts</div>
+                    <div class="tool-desc">Find all active promotions & savings</div>
+                    <div class="tool-badge new">NEW</div>
+                </div>
+
                 <!-- Team & Performance Tools -->
                 <div class="tools-section-title">👥 Team & Performance</div>
 
@@ -6568,6 +6691,314 @@
             </div>
 
             <div style="height: 100px;"></div>
+        </div>
+
+        <!-- CAMPAIGNS & DISCOUNTS HUB SCREEN -->
+        <div class="screen" id="campaigns-screen">
+            <div class="header-with-back">
+                <button class="back-button" onclick="switchScreen('tools')">← Back</button>
+                <div style="margin-top: 10px;">
+                    <div class="greeting" style="color: #1A1A1A;">🏷️ Campaigns & Discounts Hub</div>
+                    <div style="font-size: 13px; color: #757575; margin-top: 5px;">Find the best savings for your customers</div>
+                </div>
+            </div>
+
+            <div style="padding: 20px;">
+                <!-- Search Bar -->
+                <div style="margin-bottom: 20px;">
+                    <input type="text" placeholder="🔍 Search campaigns, products, benefits..."
+                           style="width: 100%; padding: 12px; border: 1px solid #E0E0E0; border-radius: 12px; font-size: 14px;"
+                           oninput="searchCampaigns(this.value)">
+                </div>
+
+                <!-- Quick Filters -->
+                <div style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px;">
+                    <div class="filter-pill active" onclick="filterCampaigns('all')" id="filter-all">🟢 All (8)</div>
+                    <div class="filter-pill" onclick="filterCampaigns('expiring')" id="filter-expiring">⚠️ Expiring (2)</div>
+                    <div class="filter-pill" onclick="filterCampaigns('vitality')" id="filter-vitality">💎 Vitality (3)</div>
+                    <div class="filter-pill" onclick="filterCampaigns('family')" id="filter-family">🏠 Family (2)</div>
+                    <div class="filter-pill" onclick="filterCampaigns('welcome')" id="filter-welcome">🎁 Welcome (1)</div>
+                </div>
+
+                <!-- Featured Campaigns -->
+                <div class="panel-header">🔥 Featured Campaigns</div>
+
+                <!-- Campaign Card: Better Together 2025 -->
+                <div class="campaign-card" data-category="welcome" onclick="viewCampaignDetail('better-together')">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px;">
+                                🎯 Better Together Promotion 2025
+                            </div>
+                            <div style="font-size: 12px; color: #E2192D; font-weight: 600;">
+                                🔥 HOT: 68 agents used this week
+                            </div>
+                        </div>
+                        <div style="background: #E8F5E9; color: #2E7D32; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;">
+                            ACTIVE
+                        </div>
+                    </div>
+
+                    <div style="font-size: 18px; font-weight: 700; color: #E2192D; margin-bottom: 8px;">
+                        💰 Up to 20% off selected plans
+                    </div>
+
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                        📅 Valid: 6 May 2025 - 31 July 2025<br>
+                        🏷️ Products: Guaranteed Protect Plus (IV), HealthShield, Term Life<br>
+                        ✅ Stackable with Vitality Discount
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="campaign-action-btn" onclick="event.stopPropagation(); addCampaignToDossier('better-together')">
+                            Add to Dossier
+                        </button>
+                        <button class="campaign-action-btn-secondary" onclick="event.stopPropagation(); copyCampaignLink('better-together')">
+                            Copy Link
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Campaign Card: AIA Vitality Discount -->
+                <div class="campaign-card" data-category="vitality" onclick="viewCampaignDetail('vitality-discount')">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px;">
+                                💎 AIA Vitality Insurance Benefit
+                            </div>
+                            <div style="font-size: 12px; color: #7B1FA2; font-weight: 600;">
+                                Vitality Members Only
+                            </div>
+                        </div>
+                        <div style="background: #F3E5F5; color: #7B1FA2; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;">
+                            ONGOING
+                        </div>
+                    </div>
+
+                    <div style="font-size: 18px; font-weight: 700; color: #7B1FA2; margin-bottom: 8px;">
+                        💰 5-15% off first-year premium
+                    </div>
+
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                        📅 Valid: Ongoing<br>
+                        🏷️ Applies to: Selected health & protection plans<br>
+                        ⭐ Tier-based: 5% (Bronze) to 15% (Platinum)
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="campaign-action-btn" onclick="event.stopPropagation(); addCampaignToDossier('vitality-discount')">
+                            Add to Dossier
+                        </button>
+                        <button class="campaign-action-btn-secondary" onclick="event.stopPropagation(); checkEligibility('vitality-discount')">
+                            Check Eligibility
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Campaign Card: Family 360 -->
+                <div class="campaign-card" data-category="family" onclick="viewCampaignDetail('family-360')">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px;">
+                                🏠 AIA Family 360
+                            </div>
+                            <div style="font-size: 12px; color: #F57C00; font-weight: 600;">
+                                Perfect for parents with kids
+                            </div>
+                        </div>
+                        <div style="background: #E8F5E9; color: #2E7D32; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;">
+                            ACTIVE
+                        </div>
+                    </div>
+
+                    <div style="font-size: 18px; font-weight: 700; color: #F57C00; margin-bottom: 8px;">
+                        🎁 3 months complimentary coverage
+                    </div>
+
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                        📅 Valid: Until 31 Dec 2025<br>
+                        🏷️ Covers: You + up to 5 dependents<br>
+                        💼 Protection: Accident + Infectious Diseases
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="campaign-action-btn" onclick="event.stopPropagation(); addCampaignToDossier('family-360')">
+                            Add to Dossier
+                        </button>
+                        <button class="campaign-action-btn-secondary" onclick="event.stopPropagation(); copyCampaignLink('family-360')">
+                            Share
+                        </button>
+                    </div>
+                </div>
+
+                <!-- More Campaigns Section -->
+                <div class="panel-header" style="margin-top: 25px;">📊 All Campaigns (8 Active)</div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <div class="campaign-mini-card" data-category="vitality" onclick="viewCampaignDetail('asia-wanderlust')">
+                        <div style="font-size: 24px; margin-bottom: 8px;">✈️</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #1A1A1A;">Asia Wanderlust</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">6 months free travel</div>
+                    </div>
+
+                    <div class="campaign-mini-card" data-category="expiring" onclick="viewCampaignDetail('maturity-2025')">
+                        <div style="font-size: 24px; margin-bottom: 8px;">💵</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #1A1A1A;">Maturity 2025</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">Up to $2K vouchers</div>
+                        <div style="background: #FFF9E6; color: #F57C00; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-top: 4px; font-weight: 600;">
+                            Ends 31 Oct
+                        </div>
+                    </div>
+
+                    <div class="campaign-mini-card" data-category="all" onclick="viewCampaignDetail('sg60-retire')">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🎂</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #1A1A1A;">SG60 Retire Well</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">Retirement discounts</div>
+                    </div>
+
+                    <div class="campaign-mini-card" data-category="vitality" onclick="viewCampaignDetail('klook-esim')">
+                        <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #1A1A1A;">Klook eSIM</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">1GB data discount</div>
+                    </div>
+
+                    <div class="campaign-mini-card" data-category="family" onclick="viewCampaignDetail('kids-protect')">
+                        <div style="font-size: 24px; margin-bottom: 8px;">👶</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #1A1A1A;">Kids Protect 2025</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">Child coverage promo</div>
+                    </div>
+
+                    <div class="campaign-mini-card" data-category="expiring" onclick="viewCampaignDetail('year-end')">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🎆</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #1A1A1A;">Year-End Bonus</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">Double rewards</div>
+                        <div style="background: #FFF9E6; color: #F57C00; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-top: 4px; font-weight: 600;">
+                            Ends 31 Dec
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eligibility Checker CTA -->
+                <div style="background: linear-gradient(to bottom, #FFF8F8 0%, #FFFFFF 100%); border: 2px solid #FFE5E5; border-radius: 12px; padding: 20px; margin-top: 25px;">
+                    <div style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin-bottom: 8px;">
+                        🔍 Not sure which campaigns apply?
+                    </div>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                        Use our Eligibility Checker to find the best savings for your customer in seconds.
+                    </div>
+                    <button style="width: 100%; background: #E2192D; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer;" onclick="openEligibilityChecker()">
+                        Open Eligibility Checker
+                    </button>
+                </div>
+
+                <div style="height: 80px;"></div>
+            </div>
+        </div>
+
+        <!-- CAMPAIGN DETAIL MODAL -->
+        <div id="campaign-detail-modal" class="campaign-modal-overlay">
+            <div class="campaign-modal-overlay-inner" onclick="if(event.target === this) closeCampaignDetail();">
+                <div class="campaign-modal-container">
+                    <!-- Content will be dynamically inserted -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ELIGIBILITY CHECKER MODAL -->
+        <div id="eligibility-checker-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9000; overflow-y: auto;">
+            <div style="min-height: 100%; display: flex; align-items: flex-end; justify-content: center;">
+                <div style="background: white; border-radius: 16px 16px 0 0; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto;">
+                    <div style="position: sticky; top: 0; background: white; padding: 20px; border-bottom: 1px solid #F0F0F0;">
+                        <button onclick="closeEligibilityChecker()" style="background: none; border: none; color: #757575; font-size: 24px; float: right; cursor: pointer;">×</button>
+                        <div style="font-size: 20px; font-weight: 700; color: #1A1A1A;">🔍 Eligibility Checker</div>
+                        <div style="font-size: 13px; color: #666; margin-top: 4px;">Find campaigns that match your customer</div>
+                    </div>
+
+                    <div style="padding: 20px;">
+                        <!-- Customer Profile Section -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; font-weight: 700; color: #1A1A1A; margin-bottom: 12px;">👤 Customer Profile</div>
+
+                            <div style="margin-bottom: 12px;">
+                                <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">Auto-fill from Lead</label>
+                                <select style="width: 100%; padding: 10px; border: 1px solid #E0E0E0; border-radius: 8px; font-size: 14px;" onchange="autofillProfile(this.value)">
+                                    <option value="">Select a lead...</option>
+                                    <option value="chen-wei">Chen Wei (42, Banking, 2 kids)</option>
+                                    <option value="sarah-tan">Sarah Tan (34, Mother of 2)</option>
+                                </select>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                                <div>
+                                    <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">Age</label>
+                                    <input type="number" id="checker-age" placeholder="42" style="width: 100%; padding: 10px; border: 1px solid #E0E0E0; border-radius: 8px;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">Dependents</label>
+                                    <input type="number" id="checker-dependents" placeholder="2" style="width: 100%; padding: 10px; border: 1px solid #E0E0E0; border-radius: 8px;">
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 12px;">
+                                <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">Income Band</label>
+                                <select id="checker-income" style="width: 100%; padding: 10px; border: 1px solid #E0E0E0; border-radius: 8px;">
+                                    <option value="">Select...</option>
+                                    <option value="3-5">$3-5K</option>
+                                    <option value="5-8">$5-8K</option>
+                                    <option value="8-12">$8-12K</option>
+                                    <option value="12-15">$12-15K</option>
+                                    <option value="15+">$15K+</option>
+                                </select>
+                            </div>
+
+                            <div style="margin-top: 12px;">
+                                <label style="font-size: 12px; color: #666; display: block; margin-bottom: 4px;">AIA Vitality Status</label>
+                                <select id="checker-vitality" style="width: 100%; padding: 10px; border: 1px solid #E0E0E0; border-radius: 8px;">
+                                    <option value="none">Not a member</option>
+                                    <option value="bronze">Bronze</option>
+                                    <option value="silver">Silver</option>
+                                    <option value="gold">Gold</option>
+                                    <option value="platinum">Platinum</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Target Products Section -->
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; font-weight: 700; color: #1A1A1A; margin-bottom: 12px;">🎯 Target Products</div>
+
+                            <label style="display: flex; align-items: center; padding: 10px; background: #FAFAFA; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                                <input type="checkbox" class="product-checkbox" value="health" style="margin-right: 10px;">
+                                <span style="font-size: 14px;">HealthShield Gold Max</span>
+                            </label>
+
+                            <label style="display: flex; align-items: center; padding: 10px; background: #FAFAFA; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                                <input type="checkbox" class="product-checkbox" value="term" style="margin-right: 10px;">
+                                <span style="font-size: 14px;">Term Life Insurance</span>
+                            </label>
+
+                            <label style="display: flex; align-items: center; padding: 10px; background: #FAFAFA; border-radius: 8px; margin-bottom: 8px; cursor: pointer;">
+                                <input type="checkbox" class="product-checkbox" value="critical" style="margin-right: 10px;">
+                                <span style="font-size: 14px;">Critical Illness Rider</span>
+                            </label>
+
+                            <label style="display: flex; align-items: center; padding: 10px; background: #FAFAFA; border-radius: 8px; cursor: pointer;">
+                                <input type="checkbox" class="product-checkbox" value="investment" style="margin-right: 10px;">
+                                <span style="font-size: 14px;">Investment-Linked Plan</span>
+                            </label>
+                        </div>
+
+                        <button style="width: 100%; background: #E2192D; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; margin-bottom: 20px;" onclick="calculateEligibility()">
+                            Calculate Eligible Campaigns
+                        </button>
+
+                        <!-- Results will be shown here -->
+                        <div id="eligibility-results" style="display: none;">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- SMART BUNDLES SCREEN -->
@@ -7627,7 +8058,8 @@
                 'tools': 'tools-screen',
                 'bundles': 'bundles-screen',
                 'objection-handler': 'objection-handler-screen',
-                'warmup': 'warmup-screen'
+                'warmup': 'warmup-screen',
+                'campaigns': 'campaigns-screen'
             };
 
             document.getElementById(screenMap[screen]).classList.add('active');
@@ -12242,6 +12674,438 @@ What do you need help with?`;
             setTimeout(() => {
                 showToast('✓ Template saved! You can now use it for similar leads.');
             }, 1000);
+        }
+
+        // ======= CAMPAIGNS HUB FUNCTIONS =======
+
+        // Campaign filtering
+        function filterCampaigns(category) {
+            // Update active pill
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            document.getElementById('filter-' + category).classList.add('active');
+
+            // Filter cards
+            const cards = document.querySelectorAll('.campaign-card, .campaign-mini-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Search campaigns
+        function searchCampaigns(query) {
+            query = query.toLowerCase().trim();
+            const cards = document.querySelectorAll('.campaign-card, .campaign-mini-card');
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) || query === '' ? 'block' : 'none';
+            });
+        }
+
+        // View campaign detail
+        function viewCampaignDetail(campaignId) {
+            const modal = document.getElementById('campaign-detail-modal');
+            const container = modal.querySelector('.campaign-modal-container');
+            const content = getCampaignDetailContent(campaignId);
+            container.innerHTML = content;
+            modal.style.display = 'block';
+        }
+
+        function closeCampaignDetail() {
+            document.getElementById('campaign-detail-modal').style.display = 'none';
+        }
+
+        // Get campaign detail content
+        function getCampaignDetailContent(campaignId) {
+            const campaigns = {
+                'better-together': {
+                    name: 'Better Together Promotion 2025',
+                    icon: '🎯',
+                    benefit: 'Up to 20% off selected plans',
+                    validity: '6 May 2025 - 31 July 2025',
+                    description: 'Bundle your health and life protection for maximum savings.',
+                    products: ['AIA Guaranteed Protect Plus (IV)', 'AIA HealthShield Gold Max', 'AIA Term Life'],
+                    eligibility: [
+                        'Purchase 2+ eligible products together',
+                        'Minimum combined annual premium: $1,200',
+                        'Age: 18-65 years',
+                        'Singapore Citizen or PR'
+                    ],
+                    howToPosition: 'Emphasize the bundling benefit—customers get comprehensive protection while saving significantly. Great for families.',
+                    compliance: [
+                        'Disclose exact discount percentage based on products selected',
+                        'Mention application deadline (31 July 2025)',
+                        'Cannot combine with Maturity Campaign'
+                    ],
+                    savings: '$840 avg. (on $4,200 annual premium)'
+                },
+                'vitality-discount': {
+                    name: 'AIA Vitality Insurance Benefit',
+                    icon: '💎',
+                    benefit: '5-15% off first-year premium',
+                    validity: 'Ongoing',
+                    description: 'Vitality members get rewarded for living healthier with premium discounts.',
+                    products: ['Selected health & protection plans', 'AIA HealthShield series', 'AIA ProActive Protect'],
+                    eligibility: [
+                        'Active AIA Vitality member',
+                        'Tier-based: Bronze (5%), Silver (7.5%), Gold (10%), Platinum (15%)',
+                        'Maintain Vitality status throughout policy year',
+                        'Applies to new policies only'
+                    ],
+                    howToPosition: 'If customer is already Vitality member, emphasize immediate savings. If not, explain how joining Vitality = double benefit (health + savings).',
+                    compliance: [
+                        'Explain Vitality membership requirements',
+                        'Disclose that discount applies to first year only',
+                        'Additional 5% promotional discount may apply (limited time)'
+                    ],
+                    savings: '$420 avg. (10% Gold tier on $4,200 premium)'
+                },
+                'family-360': {
+                    name: 'AIA Family 360',
+                    icon: '🏠',
+                    benefit: '3 months complimentary coverage',
+                    validity: 'Until 31 Dec 2025',
+                    description: 'Complimentary accident and infectious disease coverage for the whole family.',
+                    products: ['AIA HealthShield plans', 'AIA Max Care', 'AIA Smart Protect'],
+                    eligibility: [
+                        'Purchase eligible health/life plan',
+                        'At least 1 dependent required',
+                        'Covers up to 5 family members',
+                        'Age: Dependents 0-70 years'
+                    ],
+                    howToPosition: 'Perfect add-on for parents. Emphasize "no extra cost" and the peace of mind of protecting the entire family.',
+                    compliance: [
+                        'Coverage starts 14 days after policy issuance',
+                        'Explain 3-month benefit period',
+                        'This is supplementary, not a replacement'
+                    ],
+                    savings: '$180 value (estimated for family of 4)'
+                },
+                'asia-wanderlust': {
+                    name: 'Asia Wanderlust Travel Benefit',
+                    icon: '✈️',
+                    benefit: '6 months free travel insurance',
+                    validity: 'Ongoing',
+                    description: 'Vitality members get complimentary travel coverage for Asia trips.',
+                    products: ['AIA Vitality membership required'],
+                    eligibility: [
+                        'Active Vitality Gold or Platinum member',
+                        'Coverage for trips up to 90 days',
+                        'Asia destinations only'
+                    ],
+                    howToPosition: 'Great for frequent travelers - emphasize hassle-free travel without extra insurance costs.',
+                    compliance: [
+                        'Pre-existing conditions excluded',
+                        'Must activate coverage before each trip'
+                    ],
+                    savings: '$240 value (based on 4 trips/year)'
+                },
+                'maturity-2025': {
+                    name: 'Maturity Campaign 2025',
+                    icon: '💵',
+                    benefit: 'Up to $2,000 in vouchers',
+                    validity: 'Until 31 Oct 2025',
+                    description: 'Exclusive rewards for maturing policyholders who reinvest.',
+                    products: ['Any AIA endowment or savings plan'],
+                    eligibility: [
+                        'Policy maturing between Jan-Dec 2025',
+                        'Reinvest minimum $50K in new policy',
+                        'Voucher amount based on premium'
+                    ],
+                    howToPosition: 'Target customers with maturing policies - emphasize immediate cash benefit plus continued protection.',
+                    compliance: [
+                        'Vouchers issued 60 days after policy approval',
+                        'Cannot combine with Better Together promotion',
+                        'Terms and conditions apply'
+                    ],
+                    savings: 'Up to $2,000 in shopping vouchers'
+                },
+                'sg60-retire': {
+                    name: 'SG60 Retire Well Campaign',
+                    icon: '🎂',
+                    benefit: 'Special retirement plan discounts',
+                    validity: 'Until 31 Dec 2025',
+                    description: 'Celebrate Singapore\'s 60th with enhanced retirement benefits.',
+                    products: ['AIA Retirement Saver', 'AIA Golden Retirement'],
+                    eligibility: [
+                        'Age 45-60 years',
+                        'Singapore Citizen',
+                        'Premium starts from $500/month'
+                    ],
+                    howToPosition: 'Tap into national pride - emphasize securing retirement during Singapore\'s milestone year.',
+                    compliance: [
+                        'Limited to 10,000 policies nationwide',
+                        'First-come-first-served basis'
+                    ],
+                    savings: '10% premium discount + bonus payout at maturity'
+                },
+                'klook-esim': {
+                    name: 'Klook eSIM Travel Benefit',
+                    icon: '📱',
+                    benefit: '1GB data discount monthly',
+                    validity: 'Ongoing for Vitality members',
+                    description: 'Stay connected overseas with discounted Klook eSIM data.',
+                    products: ['Vitality Silver tier and above'],
+                    eligibility: [
+                        'Active Vitality member',
+                        'Silver tier: 10% off, Gold: 15% off, Platinum: 20% off'
+                    ],
+                    howToPosition: 'Great add-on benefit for tech-savvy travelers - modern convenience at lower cost.',
+                    compliance: [
+                        'Redeem through Vitality app only',
+                        'Subject to Klook availability'
+                    ],
+                    savings: 'Up to $120/year for frequent travelers'
+                },
+                'kids-protect': {
+                    name: 'Kids Protect 2025',
+                    icon: '👶',
+                    benefit: 'First year 50% off child riders',
+                    validity: 'Until 30 Jun 2025',
+                    description: 'Affordable protection for your children with major discount.',
+                    products: ['AIA Child Critical Illness Rider', 'AIA Junior Protect'],
+                    eligibility: [
+                        'Child age 0-18 years',
+                        'Must attach to parent policy',
+                        'Maximum 3 children per policy'
+                    ],
+                    howToPosition: 'Perfect for new parents or those adding family protection - emphasize peace of mind at half the cost.',
+                    compliance: [
+                        'Discount applies to first year only',
+                        'Standard underwriting required'
+                    ],
+                    savings: 'Average $180/child first year'
+                },
+                'year-end': {
+                    name: 'Year-End Bonus Rewards',
+                    icon: '🎆',
+                    benefit: 'Double Vitality points on all activities',
+                    validity: 'Nov-Dec 2025',
+                    description: 'Boost your Vitality tier before year-end with double points.',
+                    products: ['All Vitality members'],
+                    eligibility: [
+                        'Active Vitality member',
+                        'Applies to fitness, wellness, and health activities'
+                    ],
+                    howToPosition: 'Motivate customers to reach next tier - emphasize end-of-year push for better benefits.',
+                    compliance: [
+                        'Points awarded within 7 days of activity',
+                        'Cannot be combined with other point promotions'
+                    ],
+                    savings: 'Potential tier upgrade = higher insurance discounts'
+                }
+            };
+
+            const campaign = campaigns[campaignId] || campaigns['better-together'];
+
+            return `
+                <div style="display: flex; flex-direction: column; height: 100%;">
+                    <!-- Header -->
+                    <div style="padding: 16px; border-bottom: 1px solid #F0F0F0;">
+                        <button onclick="closeCampaignDetail()" style="float: right; background: none; border: none; color: #757575; font-size: 24px; cursor: pointer; line-height: 1;">×</button>
+                        <div style="font-size: 28px; margin-bottom: 6px;">${campaign.icon}</div>
+                        <div style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin-bottom: 8px;">${campaign.name}</div>
+                        <div style="background: #FFF5F5; border-left: 3px solid #E2192D; padding: 8px; border-radius: 6px;">
+                            <div style="font-size: 14px; font-weight: 700; color: #E2192D;">${campaign.benefit}</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 3px;">📅 ${campaign.validity}</div>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Content -->
+                    <div style="flex: 1; overflow-y: auto; padding: 16px;">
+                        <div style="font-size: 12px; color: #666; line-height: 1.5; margin-bottom: 12px;">${campaign.description}</div>
+
+                        <div style="background: #E8F5E9; padding: 8px 10px; border-radius: 6px; margin-bottom: 12px;">
+                            <div style="font-size: 12px; font-weight: 700; color: #2E7D32;">💰 ${campaign.savings}</div>
+                        </div>
+
+                        <details style="margin-bottom: 10px;">
+                            <summary style="font-size: 12px; font-weight: 700; color: #1A1A1A; cursor: pointer; padding: 8px; background: #FAFAFA; border-radius: 6px;">🏷️ Applicable Products</summary>
+                            <div style="padding: 8px 12px;">
+                                ${campaign.products.map(p => `<div style="font-size: 11px; color: #666; padding: 2px 0;">✓ ${p}</div>`).join('')}
+                            </div>
+                        </details>
+
+                        <details style="margin-bottom: 10px;">
+                            <summary style="font-size: 12px; font-weight: 700; color: #1A1A1A; cursor: pointer; padding: 8px; background: #FAFAFA; border-radius: 6px;">✅ Eligibility Requirements</summary>
+                            <div style="padding: 8px 12px;">
+                                ${campaign.eligibility.map(e => `<div style="font-size: 11px; color: #666; padding: 2px 0;">• ${e}</div>`).join('')}
+                            </div>
+                        </details>
+
+                        <details style="margin-bottom: 10px;">
+                            <summary style="font-size: 12px; font-weight: 700; color: #1A1A1A; cursor: pointer; padding: 8px; background: #FAFAFA; border-radius: 6px;">🎤 How to Position</summary>
+                            <div style="padding: 8px 12px;">
+                                <div style="font-size: 11px; color: #666; line-height: 1.4; font-style: italic;">"${campaign.howToPosition}"</div>
+                            </div>
+                        </details>
+
+                        <details style="margin-bottom: 10px;">
+                            <summary style="font-size: 12px; font-weight: 700; color: #F57C00; cursor: pointer; padding: 8px; background: #FFF9E6; border-radius: 6px;">⚠️ Compliance Notes</summary>
+                            <div style="padding: 8px 12px;">
+                                ${campaign.compliance.map(c => `<div style="font-size: 11px; color: #F57C00; padding: 2px 0;">• ${c}</div>`).join('')}
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- Sticky Footer Buttons -->
+                    <div style="padding: 12px 16px; border-top: 1px solid #F0F0F0; background: white; display: flex; gap: 8px;">
+                        <button style="flex: 1; background: #E2192D; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;" onclick="addCampaignToDossier('${campaignId}')">
+                            Add to Dossier
+                        </button>
+                        <button style="flex: 1; background: white; color: #E2192D; border: 2px solid #E2192D; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;" onclick="copyCampaignLink('${campaignId}')">
+                            Copy Link
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Eligibility checker functions
+        function openEligibilityChecker() {
+            document.getElementById('eligibility-checker-modal').style.display = 'block';
+            document.getElementById('eligibility-results').style.display = 'none';
+        }
+
+        function closeEligibilityChecker() {
+            document.getElementById('eligibility-checker-modal').style.display = 'none';
+        }
+
+        function autofillProfile(leadId) {
+            if (leadId === 'chen-wei') {
+                document.getElementById('checker-age').value = '42';
+                document.getElementById('checker-dependents').value = '2';
+                document.getElementById('checker-income').value = '12-15';
+                document.getElementById('checker-vitality').value = 'gold';
+            } else if (leadId === 'sarah-tan') {
+                document.getElementById('checker-age').value = '34';
+                document.getElementById('checker-dependents').value = '2';
+                document.getElementById('checker-income').value = '8-12';
+                document.getElementById('checker-vitality').value = 'silver';
+            }
+        }
+
+        function calculateEligibility() {
+            const age = parseInt(document.getElementById('checker-age').value);
+            const dependents = parseInt(document.getElementById('checker-dependents').value) || 0;
+            const vitality = document.getElementById('checker-vitality').value;
+            const selectedProducts = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => cb.value);
+
+            const results = [];
+            let totalSavings = 0;
+
+            // Better Together check
+            if (selectedProducts.length >= 2 && age >= 18 && age <= 65) {
+                results.push({
+                    name: '🎯 Better Together Promotion',
+                    savings: 840,
+                    reason: 'Multiple products + age eligible',
+                    action: 'better-together'
+                });
+                totalSavings += 840;
+            }
+
+            // Vitality check
+            if (vitality !== 'none' && selectedProducts.includes('health')) {
+                const vitalitySavings = {
+                    'bronze': 210,
+                    'silver': 315,
+                    'gold': 420,
+                    'platinum': 630
+                };
+                results.push({
+                    name: '💎 AIA Vitality Discount',
+                    savings: vitalitySavings[vitality],
+                    reason: `${vitality.charAt(0).toUpperCase() + vitality.slice(1)} Vitality member`,
+                    action: 'vitality-discount'
+                });
+                totalSavings += vitalitySavings[vitality];
+            }
+
+            // Family 360 check
+            if (dependents > 0 && selectedProducts.includes('health')) {
+                results.push({
+                    name: '🏠 AIA Family 360',
+                    savings: 180,
+                    reason: `${dependents} dependents eligible`,
+                    action: 'family-360'
+                });
+                totalSavings += 180;
+            }
+
+            // Display results
+            displayEligibilityResults(results, totalSavings);
+        }
+
+        function displayEligibilityResults(results, totalSavings) {
+            const resultsDiv = document.getElementById('eligibility-results');
+
+            let html = `
+                <div style="background: #E8F5E9; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-size: 16px; font-weight: 700; color: #2E7D32; margin-bottom: 8px;">
+                        ✅ ${results.length} Eligible Campaign${results.length !== 1 ? 's' : ''}
+                    </div>
+                    <div style="font-size: 24px; font-weight: 700; color: #2E7D32;">
+                        💰 Total Savings: $${totalSavings.toLocaleString()}
+                    </div>
+                </div>
+            `;
+
+            results.forEach((r, i) => {
+                html += `
+                    <div style="background: white; border: 1px solid #F0F0F0; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="font-size: 15px; font-weight: 700; color: #1A1A1A;">${i + 1}. ${r.name}</div>
+                            <div style="background: #E8F5E9; color: #2E7D32; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                $${r.savings}
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                            ✓ Why: ${r.reason}
+                        </div>
+                        <button style="width: 100%; background: #FFF5F5; color: #E2192D; border: 1px solid #E2192D; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="viewCampaignDetail('${r.action}'); closeEligibilityChecker();">
+                            View Details
+                        </button>
+                    </div>
+                `;
+            });
+
+            if (results.length === 0) {
+                html = `
+                    <div style="background: #FFF9E6; border-radius: 12px; padding: 20px; text-align: center;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">😕</div>
+                        <div style="font-size: 16px; font-weight: 700; color: #F57C00; margin-bottom: 8px;">
+                            No Matching Campaigns
+                        </div>
+                        <div style="font-size: 13px; color: #666;">
+                            Try adjusting the customer profile or selected products.
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+
+        // Helper functions
+        function addCampaignToDossier(campaignId) {
+            showToast('✅ Campaign added to dossier!');
+            closeCampaignDetail();
+        }
+
+        function copyCampaignLink(campaignId) {
+            showToast('📋 Campaign link copied!');
+        }
+
+        function checkEligibility(campaignId) {
+            openEligibilityChecker();
         }
     </script>
 </body>
